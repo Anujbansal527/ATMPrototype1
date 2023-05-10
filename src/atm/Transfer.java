@@ -4,12 +4,15 @@
  */
 package atm;
 
+import static java.lang.Integer.parseInt;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -24,48 +27,42 @@ public class Transfer extends javax.swing.JFrame {
      */
     public Transfer() {
         initComponents();
-         
+
     }
-    
-    int MyAccNum;  
+
+    int MyAccNum;
+
     public Transfer(int AccountNum) {
         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         GetBalance();
     }
-     Connection conn = null,conn2=null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
-        int OldBalance;
-        
-   private void GetBalance()
-    {
-         String Query ="select * from accsingup where AccNum='"+MyAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance =  rs1.getInt(10);
-            Bal.setText("Rs."+OldBalance);
-        }
-        else
-            {
+    Connection conn = null, conn2 = null;
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
+    int OldBalance;
+
+    private void GetBalance() {
+        String Query = "select * from accsingup where AccNum='" + MyAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance = rs1.getInt(10);
+                Bal.setText("Rs." + OldBalance);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
-   
-   
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -227,98 +224,129 @@ public class Transfer extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    String MyDate;
+
+    public void GetDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        MyDate = dtf.format(now);
+    }
+
+    int TrId = 0;
+
+    private void Count() {
+        try {
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery("select Max(Tid) from trans");
+            TrId = parseInt("" + rs1);
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void transferMoney() {
+        try {
+            GetDate();
+            Count();
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            PreparedStatement Add = conn.prepareStatement("insert into trans values(?,?,?,?,?)");
+            Add.setInt(1, TrId);
+            Add.setInt(2, MyAccNum);
+            Add.setString(3, "Transfer");
+            Add.setString(4, MyDate);
+            Add.setString(5, Integer.toString(OldBalance));
+
+            int row = Add.executeUpdate();
+
+            conn.close();
+            // Clear();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e);
+        }
+    }
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
-        Connection conn3 = null;
-        PreparedStatement pst3 = null;
-        ResultSet rs3=null;
-        Statement st3=null;   
-        
-        int OldBalance2;
-       
-   private void GetBalance2()
-    {
-        int TAccNum=Integer.valueOf(AccNum2.getText());
-         String Query ="select * from accsingup where AccNum='"+TAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance2 =  rs1.getInt(10);
-        }
-        else
-            {
+    Connection conn3 = null;
+    PreparedStatement pst3 = null;
+    ResultSet rs3 = null;
+    Statement st3 = null;
+
+    int OldBalance2;
+
+    private void GetBalance2() {
+        int TAccNum = Integer.valueOf(AccNum2.getText());
+        String Query = "select * from accsingup where AccNum='" + TAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance2 = rs1.getInt(10);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
-  
+
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        String x=AccNum2.getText();
-        
-       
-                JOptionPane.showMessageDialog(this,"You Have Enter Same ACCOUNT Number"); 
+        String x = AccNum2.getText();
+        String y = Integer.toString(MyAccNum);
 
-                if(x.isEmpty() || x.equals(0) || x.length()!=8 )
-                {
-                       JOptionPane.showMessageDialog(this,"Enter Valid Eight Digit Account Number"); 
-                }
-                else if(Ammn.getText().isEmpty() || Ammn.getText().equals(0))
-                {
-                       JOptionPane.showMessageDialog(this,"Enter Valid Ammount");
-                }
-                else if(OldBalance < Integer.valueOf(Ammn.getText()))
-                {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Is Not Available "+OldBalance);
-                }
+        if (x.isEmpty() || x.equals(0) || x.length() != 8) {
 
-        else
-        {
-            try{
-                //update main acc
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-Integer.valueOf(Ammn.getText()));
-            ps.setInt(2,MyAccNum);
-           
-            //update 2nd acc
-            GetBalance2();
-            conn2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            
-            String Query2= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-           
-            PreparedStatement ps1 = conn.prepareStatement(Query2);
-            ps1.setInt(1,OldBalance2+Integer.valueOf(Ammn.getText()));
-            ps1.setInt(2,Integer.valueOf(AccNum2.getText()));
-            
-            if(ps.executeUpdate()==1 && ps1.executeUpdate()==1)
-            {
-              
-                JOptionPane.showMessageDialog(this, "Balance Transfered Sucesssfuly");
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Missing Information");
-                }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            JOptionPane.showMessageDialog(this, "Enter Valid Eight Digit Account Number");
+        } else if (Ammn.getText().isEmpty() || Ammn.getText().equals(0)) {
 
+            JOptionPane.showMessageDialog(this, "Enter Valid Ammount");
+        } else if (OldBalance < Integer.valueOf(Ammn.getText())) {
+
+            JOptionPane.showMessageDialog(this, "Enough Ammount Is Not Available. \n Availavable Ammount " + OldBalance);
+        } else {
+            if (x.equals(y)) {
+                JOptionPane.showMessageDialog(this, "You Have Enter Same ACCOUNT Number.... Your Account Number Is" + y);
+            } else {
+                try {
+                    //update main acc          
+
+                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                    String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                    PreparedStatement ps = conn.prepareStatement(Query);
+                    ps.setInt(1, OldBalance - Integer.valueOf(Ammn.getText()));
+                    ps.setInt(2, MyAccNum);
+
+                    //update 2nd acc
+                    GetBalance2();
+                    conn2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+
+                    String Query2 = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                    PreparedStatement ps1 = conn.prepareStatement(Query2);
+                    ps1.setInt(1, OldBalance2 + Integer.valueOf(Ammn.getText()));
+                    ps1.setInt(2, Integer.valueOf(AccNum2.getText()));
+
+                    if (ps.executeUpdate() == 1 && ps1.executeUpdate() == 1) {
+                        JOptionPane.showMessageDialog(this, "Balance Transfered Sucesssfuly");
+                        JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                        transferMoney();
+                        new Balance(MyAccNum).setVisible(true);
+                        this.dispose();
+                    } else {
+
+                        JOptionPane.showMessageDialog(this, "Missing Information");
+
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, e);
+
+                }
             }
         }
-           
 
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1MouseClicked
@@ -328,16 +356,16 @@ public class Transfer extends javax.swing.JFrame {
     }//GEN-LAST:event_AccNum2ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        //new login().setVisible(true);
+        //new Login().setVisible(true);
         new MainMenu(MyAccNum).setVisible(true);
-          setVisible(false);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
-     // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**

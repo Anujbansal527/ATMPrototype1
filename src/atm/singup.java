@@ -1,8 +1,9 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package atm;
+
 import static java.lang.Integer.parseInt;
 import java.sql.*;
 import javax.swing.JOptionPane;
@@ -189,77 +190,65 @@ public class singup extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-        Connection conn = null;
-        PreparedStatement pst = null;
-        ResultSet rs=null;
-        Statement st=null;
-        
-        private void Clear()
-        {
-            AccNum.setText("");
-            FName.setText("");
-            LName.setText("");
-            PhoneNum.setText("");
-            Address.setText("");
-            Occupation.setText("");
-            Pin.setText("");
-            Education.setSelectedIndex(-1);
-            
-        }
-        
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    Statement st = null;
+
+    private void Clear() {
+        AccNum.setText("");
+        FName.setText("");
+        LName.setText("");
+        PhoneNum.setText("");
+        Address.setText("");
+        Occupation.setText("");
+        Pin.setText("");
+        Education.setSelectedIndex(-1);
+
+    }
+
     private void SubmitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SubmitMouseClicked
-        String x=Pin.getText();
-        String y=AccNum.getText();
-        String z=PhoneNum.getText();
-        if(AccNum.getText().isEmpty() || FName.getText().isEmpty() || LName.getText().isEmpty() || PhoneNum.getText().isEmpty() || Address.getText().isEmpty() ||  Occupation.getText().isEmpty() || Pin.getText().isEmpty())
-        {
+        String x = Pin.getText();
+        String y = AccNum.getText();
+        String z = PhoneNum.getText();
+        if (AccNum.getText().isEmpty() || FName.getText().isEmpty() || LName.getText().isEmpty() || PhoneNum.getText().isEmpty() || Address.getText().isEmpty() || Occupation.getText().isEmpty() || Pin.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Missing Information");
 
-        }
-       
-        else
-        {
-            if (x.length()!=6 )
-                 {
-                     JOptionPane.showMessageDialog(this, "Enter Six Digit Pin");
-                 }
-            if (y.length()!=8)
-                 {
-                     JOptionPane.showMessageDialog(this, "Enter Eight Digit Account Number ");
-                     //acc num update
-                 }
-            if (z.length()!=10)
-                 {
-                     JOptionPane.showMessageDialog(this, "Enter Ten Digit Phone Number ");
-                     //acc num update
-                 }
-            else{
-                try
-                {
-                   conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-                   PreparedStatement Add =conn.prepareStatement("insert into accsingup values(?,?,?,?,?,?,?,?,?,?)");
-                   Add.setInt(1,Integer.valueOf(AccNum.getText()));
-                   Add.setString(2, FName.getText());
-                   Add.setString(3, LName.getText());
-                   Add.setString(4, PhoneNum.getText());
-                   Add.setString(5, Address.getText());
-                   Add.setString(6, Occupation.getText());
-                   Add.setString(7, Education.getSelectedItem().toString());
-                   Add.setString(8, DOB.getDate().toString());
-                   Add.setInt(9,Integer.valueOf(Pin.getText()));
-                   Add.setInt(10,0);
+        } else {
+            if (x.length() != 6) {
+                JOptionPane.showMessageDialog(this, "Enter Six Digit Pin");
+            }
+            if (y.length() != 8) {
+                JOptionPane.showMessageDialog(this, "Enter Eight Digit Account Number ");
+                //acc num update
+            }
+            if (z.length() != 10) {
+                JOptionPane.showMessageDialog(this, "Enter Ten Digit Phone Number ");
+                //acc num update
+            } else {
+                try {
+                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                    PreparedStatement Add = conn.prepareStatement("insert into accsingup values(?,?,?,?,?,?,?,?,?,?)");
+                    Add.setInt(1, Integer.valueOf(AccNum.getText()));
+                    Add.setString(2, FName.getText());
+                    Add.setString(3, LName.getText());
+                    Add.setString(4, PhoneNum.getText());
+                    Add.setString(5, Address.getText());
+                    Add.setString(6, Occupation.getText());
+                    Add.setString(7, Education.getSelectedItem().toString());
+                    Add.setString(8, DOB.getDate().toString());
+                    Add.setInt(9, Integer.valueOf(Pin.getText()));
+                    Add.setInt(10, 0);
 
-                   int row= Add.executeUpdate();
+                    int row = Add.executeUpdate();
 
-                   JOptionPane.showMessageDialog(this,"Account Saved");
+                    JOptionPane.showMessageDialog(this, "Account Saved");
 
-                   conn.close();
-                   Clear();
+                    conn.close();
+                    Clear();
 
-                }
-                catch(Exception e)
-                {
-                    JOptionPane.showMessageDialog(this,"Enter Valid Inputs");
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Enter Valid Inputs");
                     //JOptionPane.showMessageDialog(this,e);
                 }
             }
@@ -267,7 +256,7 @@ public class singup extends javax.swing.JFrame {
     }//GEN-LAST:event_SubmitMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed

@@ -23,11 +23,12 @@ public class ChangePin extends javax.swing.JFrame {
     public ChangePin() {
         initComponents();
     }
-     int MyAccNum;
+    int MyAccNum;
+
     public ChangePin(int AccountNum) {
-         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        initComponents();
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
     }
 
     /**
@@ -162,45 +163,35 @@ public class ChangePin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-        Connection conn = null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
+    Connection conn = null;
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-            
-        if(npin .getText().isEmpty() || cpin.getText().isEmpty())
-        {
+
+        if (npin.getText().isEmpty() || cpin.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter Your New Pin");
-        }
-        else if(!npin.getText().equals(cpin.getText()))
-        {
+        } else if (!npin.getText().equals(cpin.getText())) {
             JOptionPane.showMessageDialog(this, "Both Pin Are Not Matched");
 
-        }
-        else
-        {
-            try{
-                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Pin = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,Integer.valueOf(npin.getText()));
-            ps.setInt(2,MyAccNum);
-            if(ps.executeUpdate()==1)
-            {
-                JOptionPane.showMessageDialog(this, "Pin Changed Sucessfull");
-               // new MainMenu(MyAccNum).setVisible(true);
-                //this.dispose();
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Missing Information");
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Pin = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, Integer.valueOf(npin.getText()));
+                ps.setInt(2, MyAccNum);
+                if (ps.executeUpdate() == 1) {
+                    JOptionPane.showMessageDialog(this, "Pin Changed Sucessfull");
+                    // new MainMenu(MyAccNum).setVisible(true);
+                    //this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Missing Information");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
             }
         }
         // TODO add your handling code here:
@@ -208,12 +199,12 @@ public class ChangePin extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         new MainMenu(MyAccNum).setVisible(true);
-          setVisible(false);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed

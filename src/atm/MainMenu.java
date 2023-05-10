@@ -16,13 +16,15 @@ public class MainMenu extends javax.swing.JFrame {
     public MainMenu() {
         initComponents();
     }
-    
+
     int MyAccNum;
+
     public MainMenu(int AccountNum) {
         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -239,12 +241,12 @@ public class MainMenu extends javax.swing.JFrame {
     private void depositMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_depositMouseClicked
         new Deposite(MyAccNum).setVisible(true);
         this.dispose();
-        
-            // TODO add your handling code here:
+
+        // TODO add your handling code here:
     }//GEN-LAST:event_depositMouseClicked
 
     private void withdrawMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_withdrawMouseClicked
-         new Withdraw(MyAccNum).setVisible(true);
+        new Withdraw(MyAccNum).setVisible(true);
         this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_withdrawMouseClicked
@@ -262,12 +264,12 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void ministatementMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ministatementMouseClicked
         new MiniState(MyAccNum).setVisible(true);
-        this.dispose(); 
+        this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_ministatementMouseClicked
 
     private void changepinMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_changepinMouseClicked
-         new ChangePin(MyAccNum).setVisible(true);
+        new ChangePin(MyAccNum).setVisible(true);
         this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_changepinMouseClicked
@@ -290,7 +292,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
 
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
@@ -356,4 +358,4 @@ public class MainMenu extends javax.swing.JFrame {
     private javax.swing.JButton withdraw;
     // End of variables declaration//GEN-END:variables
 
- }
+}

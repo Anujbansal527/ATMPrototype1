@@ -9,7 +9,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -24,30 +27,34 @@ public class MiniState extends javax.swing.JFrame {
         initComponents();
     }
     int MyAccNum;
+
     public MiniState(int AccountNum) {
-         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        initComponents();
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         DisplayTr();
     }
-    
-        Connection conn = null;
-        PreparedStatement pst = null;
-        ResultSet rs=null;
-        Statement st=null;
-        
-    private void DisplayTr()
-            {
-                try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
+
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    Statement st = null;
+
+    private void DisplayTr() {
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
             st = conn.createStatement();
-            rs = st.executeQuery("select * from transecctions where AccNum='"+MyAccNum+"'");
-            //minitable.setModel(.resultSetToTableModel(rs));
-            }catch(Exception e)
-            {
-                
-            }
-            }
+            rs = st.executeQuery("select * from trans where AccNum='" + MyAccNum + "'");
+           //jTable1.setAutoResizeModel(jTable1.AUTO_RESIZE_OFF);
+           jTable1.setModel(DbUtils.resultSetToTableModel(rs));
+        } catch (Exception e) {
+            JFrame jf=new JFrame();
+            jf.setAlwaysOnTop(true);
+            JOptionPane.showMessageDialog(jf, e);
+        }
+        
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,26 +64,36 @@ public class MiniState extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         AccNum = new javax.swing.JLabel();
         logout = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        minitable = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        minitable1 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        minitable2 = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocation(new java.awt.Point(0, 0));
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jTable1.setAutoCreateRowSorter(true);
+        jTable1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        jTable1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        getContentPane().add(jTable1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, 1000, 480));
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
@@ -147,33 +164,6 @@ public class MiniState extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1366, 100));
 
-        minitable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(minitable);
-        if (minitable.getColumnModel().getColumnCount() > 0) {
-            minitable.getColumnModel().getColumn(0).setResizable(false);
-            minitable.getColumnModel().getColumn(1).setResizable(false);
-        }
-
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 220, 370, 350));
-
         jButton1.setText("BACK");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -190,80 +180,31 @@ public class MiniState extends javax.swing.JFrame {
         });
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 590, 200, 50));
 
-        minitable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(minitable1);
-        if (minitable1.getColumnModel().getColumnCount() > 0) {
-            minitable1.getColumnModel().getColumn(0).setResizable(false);
-            minitable1.getColumnModel().getColumn(1).setResizable(false);
-        }
-
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 220, 370, 350));
-
-        minitable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane3.setViewportView(minitable2);
-        if (minitable2.getColumnModel().getColumnCount() > 0) {
-            minitable2.getColumnModel().getColumn(0).setResizable(false);
-            minitable2.getColumnModel().getColumn(1).setResizable(false);
-        }
-
-        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 370, 350));
-
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/atm.jpg"))); // NOI18N
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 1390, 750));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 1390, 750));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 200, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         new MainMenu(MyAccNum).setVisible(true);
-          setVisible(false);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        JOptionPane.showMessageDialog(this,"Your MINI Statement Successfully Printed ");
+      
+        DisplayTr();
+        
+        
+        JOptionPane.showMessageDialog(this, "Your MINI Statement Successfully Printed ");
 
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -298,7 +239,7 @@ public class MiniState extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MiniState().setVisible(true);
+            new MiniState().setVisible(true);
             }
         });
     }
@@ -313,11 +254,7 @@ public class MiniState extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable jTable1;
     private javax.swing.JButton logout;
-    private javax.swing.JTable minitable;
-    private javax.swing.JTable minitable1;
-    private javax.swing.JTable minitable2;
     // End of variables declaration//GEN-END:variables
 }

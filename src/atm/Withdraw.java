@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -26,99 +28,83 @@ public class Withdraw extends javax.swing.JFrame {
     public Withdraw() {
         initComponents();
     }
-    
+
     Connection conn = null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
-        int OldBalance;
-    
-        int MyAccNum;
-   
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
+    int OldBalance;
+
+    int MyAccNum;
+
     public Withdraw(int AccountNum) {
-         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        initComponents();
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         GetBalance();
-        
+
     }
-    
+
     String MyDate;
-    public void GetDate()
-    {
-        Date d=new Date();
-        SimpleDateFormat s=new SimpleDateFormat("dd-mm-yyy");
-        MyDate = s.format(d);
+
+    public void GetDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        MyDate = dtf.format(now);
     }
-    
-   int TrId=0;
-    private void Count()
-    {
-        try
-        {
-            st1 =conn.createStatement();
-            rs1=st1.executeQuery("select Max(Tid) from transecctions");
-            TrId =parseInt(""+ rs1); 
-        }catch(Exception e)
-        {
-        
+
+    int TrId = 0;
+
+    private void Count() {
+        try {
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery("select Max(Tid) from trans");
+            TrId = parseInt("" + rs1);
+        } catch (Exception e) {
+
         }
     }
-    
-     private void WithDrawMoney()
-    {
-        try
-            {
-               GetDate();
-               Count();
-               conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-               PreparedStatement Add =conn.prepareStatement("insert into transecctions values(?,?,?,?,?)");
-               Add.setInt(1,TrId);
-               Add.setInt(2, MyAccNum);
-               Add.setString(3, "WithDraw");
-               Add.setString(4, AccNum.getText());
-               Add.setString(5, MyDate);
-               
-                       
-               int row= Add.executeUpdate();
-               TrId++;
-                //JOptionPane.showMessageDialog(this,"Account Saved");
-               
-               conn.close();
-               // Clear();
-            }
-            catch(Exception e)
-            {
-               //JOptionPane.showMessageDialog(this, e);
-                //error solve karna hai mini statement wali
-            }
-    }
-   
-        
-    private void GetBalance()
-    {
-         String Query ="select * from accsingup where AccNum='"+MyAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance =  rs1.getInt(10);
-            Bal.setText(""+OldBalance);
+
+    private void WithDrawMoney() {
+        try {
+            GetDate();
+            Count();
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            PreparedStatement Add = conn.prepareStatement("insert into trans values(?,?,?,?,?)");
+            Add.setInt(1, TrId);
+            Add.setInt(2, MyAccNum);
+            Add.setString(3, "WithDraw");
+            Add.setString(4, MyDate);
+            Add.setString(5, Integer.toString(OldBalance));
+
+            int row = Add.executeUpdate();
+
+            conn.close();
+            // Clear();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e);
+            //error solve karna hai mini statement wali
         }
-        else
-            {
+    }
+
+    private void GetBalance() {
+        String Query = "select * from accsingup where AccNum='" + MyAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance = rs1.getInt(10);
+                Bal.setText("" + OldBalance);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -270,29 +256,22 @@ public class Withdraw extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-     
-                
-                if(Amntb.getText().isEmpty() || Amntb.getText().equals(0))
-                   {
-                    JOptionPane.showMessageDialog(this,"Enter Valid Ammount");
-                   }
-                else if(OldBalance < Integer.valueOf(Amntb.getText()))
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Is Not Available "+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-Integer.valueOf(Amntb.getText()));
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-              /*  String newbal =" select Balance from accsingup where AccNum = '"+MyAccNum+"';";
+
+        if (Amntb.getText().isEmpty() || Amntb.getText().equals(0)) {
+            JOptionPane.showMessageDialog(this, "Enter Valid Ammount");
+        } else if (OldBalance < Integer.valueOf(Amntb.getText())) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Is Not Available " + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - Integer.valueOf(Amntb.getText()));
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+                    /*  String newbal =" select Balance from accsingup where AccNum = '"+MyAccNum+"';";
                try
                 {
                  conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
@@ -302,28 +281,26 @@ public class Withdraw extends javax.swing.JFrame {
                catch(Exception e)
                   {
                    }*/
-                
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-                WithDrawMoney();
-               
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Missing Information");
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                    WithDrawMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Missing Information");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-        
-        // TODO add your handling code here:
+
+            // TODO add your handling code here:
     }//GEN-LAST:event_jButton1MouseClicked
     }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         new MainMenu(MyAccNum).setVisible(true);
-          setVisible(false);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -332,11 +309,11 @@ public class Withdraw extends javax.swing.JFrame {
     }//GEN-LAST:event_AmntbActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed
-    
+
     /**
      * @param args the command line arguments
      */
@@ -366,8 +343,8 @@ public class Withdraw extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-                 public void run() {
-                 new Withdraw().setVisible(true);
+            public void run() {
+                new Withdraw().setVisible(true);
             }
         });
     }

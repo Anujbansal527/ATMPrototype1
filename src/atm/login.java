@@ -15,13 +15,12 @@ import javax.swing.JOptionPane;
  *
  * @author Anuj Bansal
  */
-
-public class login extends javax.swing.JFrame {
+public class Login extends javax.swing.JFrame {
 
     /**
      * Creates new form login
      */
-    public login() {
+    public Login() {
         initComponents();
     }
 
@@ -137,40 +136,31 @@ public class login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
-        Connection conn = null;
-        PreparedStatement pst = null;
-        ResultSet rs=null;
-        Statement st=null;
-        
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    Statement st = null;
+
     private void LoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginMouseClicked
-       
-        if(Uname.getText().isEmpty() || Upass.getText().isEmpty())
-        {
+
+        if (Uname.getText().isEmpty() || Upass.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Enter Account Number And Pin Number");
-        }
-        else
-        {
-        String Query ="select * from accsingup where AccNum='"+Uname.getText()+"' and Pin='"+Upass.getText()+"' ";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st = conn.createStatement();
-        rs = st.executeQuery(Query);
-        if(rs.next())
-        {
-            new MainMenu(rs.getInt(1)).setVisible(true);
-            this.dispose();
-        }
-        else
-            {
-                JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
+        } else {
+            String Query = "select * from accsingup where AccNum='" + Uname.getText() + "' and Pin='" + Upass.getText() + "' ";
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                st = conn.createStatement();
+                rs = st.executeQuery(Query);
+                if (rs.next()) {
+                    new MainMenu(rs.getInt(1)).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Wrong Account Number Or Pin");
+                }
+            } catch (Exception e) {
+
             }
-       }
-       catch(Exception e)
-        {
-           
         }
-       }
         // TODO add your handling code here:
     }//GEN-LAST:event_LoginMouseClicked
 
@@ -201,20 +191,21 @@ public class login extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new login().setVisible(true);
+                new Login().setVisible(true);
             }
         });
     }

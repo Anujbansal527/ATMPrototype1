@@ -11,7 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import static javax.print.attribute.Size2DSyntax.MM;
 import javax.swing.JOptionPane;
 
 /**
@@ -26,45 +29,42 @@ public class Deposite extends javax.swing.JFrame {
     public Deposite() {
         initComponents();
     }
-    
+
     int MyAccNum;
-     public Deposite(int AccountNum) {
+
+    public Deposite(int AccountNum) {
         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         GetBalance();
     }
 
-        Connection conn = null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
-        int OldBalance;
-        
-    private void GetBalance()
-    {
-         String Query ="select * from accsingup where AccNum='"+MyAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance =  rs1.getInt(10);
-            Bal.setText("Rs."+OldBalance);
-        }
-        else
-            {
+    //connection code
+    Connection conn = null;
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
+    //getting account balance    
+    int OldBalance;
+
+    private void GetBalance() {
+        String Query = "select * from accsingup where AccNum='" + MyAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance = rs1.getInt(10);
+                Bal.setText("Rs." + OldBalance);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -210,92 +210,84 @@ public class Deposite extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-   
-  
-    String MyDate;
+
+    //transection details
+    /*String MyDate;
     public void GetDate()
     {
         Date d=new Date();
         SimpleDateFormat s=new SimpleDateFormat("dd-mm-yyy");
         MyDate = s.format(d);
+    }*/
+    String MyDate;
+
+    public void GetDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        MyDate = dtf.format(now);
     }
-    
-   
-   int TrId=0;
-    private void Count()
-    {
-        try
-        {
-            st1 =conn.createStatement();
-            rs1=st1.executeQuery("select Max(Tid) from transecctions");
-            TrId =parseInt(""+ rs1); 
-        }catch(Exception e)
-        {
-        
+
+    int TrId = 0;
+
+    private void Count() {
+        try {
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery("select Max(Tid) from trans");
+            TrId = parseInt("" + rs1);
+        } catch (Exception e) {
+
         }
     }
-    
-    private void DepositeMoney()
-    {
-        try
-            {
-               GetDate();
-               Count();
-               conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-               PreparedStatement Add =conn.prepareStatement("insert into transecctions values(?,?,?,?,?)");
-               Add.setInt(1,TrId);
-               Add.setInt(2, MyAccNum);
-               Add.setString(3, "Deposit");
-               Add.setString(4, AccNum.getText());
-               Add.setString(5, MyDate);
-              
-                       
-               int row= Add.executeUpdate();
-               
-               // JOptionPane.showMessageDialog(this,"Account Saved");
-               
-               conn.close();
-               // Clear();
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this, e);
-            }
+
+    private void DepositeMoney() {
+        try {
+            GetDate();
+            Count();
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            PreparedStatement Add = conn.prepareStatement("insert into trans values(?,?,?,?,?)");
+            Add.setInt(1, TrId);
+            Add.setInt(2, MyAccNum);
+            Add.setString(3, "Deposit");
+            Add.setString(4, MyDate);
+            Add.setString(5, Integer.toString(OldBalance));
+
+            int row = Add.executeUpdate();
+
+            conn.close();
+            // Clear();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e);
+        }
     }
     private void DepositActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DepositActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_DepositActionPerformed
 
     private void DepositMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DepositMouseClicked
-            
-        if(Amntb.getText().isEmpty() || Amntb.getText().equals(0))
-        {
-               JOptionPane.showMessageDialog(this,"Enter Valid Ammount");
-        }
-        else
-        {
-            try{
-                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance+Integer.valueOf(Amntb.getText()));
-            ps.setInt(2,MyAccNum);
-            if(ps.executeUpdate()==1)
-            {
-                
-                JOptionPane.showMessageDialog(this, "Balance Updated");
-                DepositeMoney();
-                
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Missing Information");
+
+        if (Amntb.getText().isEmpty() || Amntb.getText().equals(0)) {
+            JOptionPane.showMessageDialog(this, "Enter Valid Ammount");
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance + Integer.valueOf(Amntb.getText()));
+                ps.setInt(2, MyAccNum);
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated");
+                    DepositeMoney();
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Missing Information");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
         }
@@ -303,16 +295,16 @@ public class Deposite extends javax.swing.JFrame {
     }//GEN-LAST:event_DepositMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-         new login().setVisible(true);
-         setVisible(false);
-        
-       new MainMenu(MyAccNum).setVisible(true);
+        new Login().setVisible(true);
+        setVisible(false);
+
+        new MainMenu(MyAccNum).setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void LOGOUTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LOGOUTActionPerformed
 
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_LOGOUTActionPerformed

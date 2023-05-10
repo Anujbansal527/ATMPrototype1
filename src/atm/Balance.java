@@ -22,42 +22,36 @@ public class Balance extends javax.swing.JFrame {
     public Balance() {
         initComponents();
     }
-     int MyAccNum;
+    int MyAccNum;
+
     public Balance(int AccountNum) {
-         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        initComponents();
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         GetBalance();
     }
-    
-         Connection conn = null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
-        int OldBalance;
-        
-   private void GetBalance()
-    {
-         String Query ="select * from accsingup where AccNum='"+MyAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance =  rs1.getInt(10);
-            Bal.setText("RS."+OldBalance);
-        }
-        else
-            {
+
+    Connection conn = null;
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
+    int OldBalance;
+
+    private void GetBalance() {
+        String Query = "select * from accsingup where AccNum='" + MyAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance = rs1.getInt(10);
+                Bal.setText("RS." + OldBalance);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
 
@@ -181,13 +175,13 @@ public class Balance extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-            new MainMenu(MyAccNum).setVisible(true);
-            setVisible(false);
+        new MainMenu(MyAccNum).setVisible(true);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        new login().setVisible(true);
+        new Login().setVisible(true);
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed

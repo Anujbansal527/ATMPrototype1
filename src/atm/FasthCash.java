@@ -4,11 +4,16 @@
  */
 package atm;
 
+import static java.lang.Integer.parseInt;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -23,44 +28,39 @@ public class FasthCash extends javax.swing.JFrame {
     public FasthCash() {
         initComponents();
     }
-    int MyAccNum;  
+    int MyAccNum;
+
     public FasthCash(int AccountNum) {
         initComponents();
-        MyAccNum =AccountNum;
-        AccNum.setText(""+MyAccNum);
+        MyAccNum = AccountNum;
+        AccNum.setText("" + MyAccNum);
         GetBalance();
     }
 
-        Connection conn = null;
-        PreparedStatement pst = null,pst1=null;
-        ResultSet rs=null,rs1=null;
-        Statement st=null,st1=null;
-        
-        int OldBalance;
-        
-   private void GetBalance()
-    {
-         String Query ="select * from accsingup where AccNum='"+MyAccNum+"'";
-       try
-       {
-        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-        st1 = conn.createStatement();
-        rs1 = st1.executeQuery(Query);
-        if(rs1.next())
-        {
-            OldBalance =  rs1.getInt(10);
-            Bal.setText("Rs."+OldBalance);
-        }
-        else
-            {
+    Connection conn = null;
+    PreparedStatement pst = null, pst1 = null;
+    ResultSet rs = null, rs1 = null;
+    Statement st = null, st1 = null;
+
+    int OldBalance;
+
+    private void GetBalance() {
+        String Query = "select * from accsingup where AccNum='" + MyAccNum + "'";
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery(Query);
+            if (rs1.next()) {
+                OldBalance = rs1.getInt(10);
+                Bal.setText("Rs." + OldBalance);
+            } else {
                 //JOptionPane.showMessageDialog(this,"Wrong Account Number Or Pin");
             }
-       }
-       catch(Exception e)
-        {
-           
+        } catch (Exception e) {
+
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -238,228 +238,244 @@ public class FasthCash extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    String MyDate;
+
+    public void GetDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        MyDate = dtf.format(now);
+    }
+
+    int TrId = 0;
+
+    private void Count() {
+        try {
+            st1 = conn.createStatement();
+            rs1 = st1.executeQuery("select Max(Tid) from trans");
+            TrId = parseInt("" + rs1);
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void FastCashMoney() {
+        try {
+            GetDate();
+            Count();
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+            PreparedStatement Add = conn.prepareStatement("insert into trans values(?,?,?,?,?)");
+            Add.setInt(1, TrId);
+            Add.setInt(2, MyAccNum);
+            Add.setString(3, "Fast Cash");
+            Add.setString(4, MyDate);
+            Add.setString(5, Integer.toString(OldBalance));
+
+            int row = Add.executeUpdate();
+
+            conn.close();
+            // Clear();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e);
+        }
+    }
+
     private void a100MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a100MouseClicked
-        
-        if(OldBalance < 100)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-100);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-                
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+
+        if (OldBalance < 100) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 100);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }                
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a100MouseClicked
 
     private void a200MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a200MouseClicked
-        
-         if(OldBalance < 200)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-200);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-              
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+
+        if (OldBalance < 200) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 200);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }   
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a200MouseClicked
 
     private void a500MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a500MouseClicked
-             if(OldBalance < 500)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-500);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-               
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+        if (OldBalance < 500) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 500);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }   
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a500MouseClicked
 
     private void a1000MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a1000MouseClicked
-             if(OldBalance < 1000)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-1000);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-               
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+        if (OldBalance < 1000) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 1000);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }   
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a1000MouseClicked
 
     private void a10000MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a10000MouseClicked
-         if(OldBalance < 10000)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-10000);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-               
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+        if (OldBalance < 10000) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 10000);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }   
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a10000MouseClicked
 
     private void a20000MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_a20000MouseClicked
 
-             if(OldBalance < 20000)
-                    {
-                    JOptionPane.showMessageDialog(this,"Enough Ammount Not Available"+OldBalance);
-                    }
-                else
-                    {
-            try{
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm","root","root");
-            String Query= "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
-            
-            PreparedStatement ps = conn.prepareStatement(Query);
-            ps.setInt(1,OldBalance-20000);
-            ps.setInt(2,MyAccNum);
-            
-            if(ps.executeUpdate()==1)
-            {
-             
-                JOptionPane.showMessageDialog(this, "Balance Updated ");
-                
-            }
-            else
-                {
-                    JOptionPane.showMessageDialog(this,"Unsufficient Balance");
+        if (OldBalance < 20000) {
+            JOptionPane.showMessageDialog(this, "Enough Ammount Not Available" + OldBalance);
+        } else {
+            try {
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/atm", "root", "root");
+                String Query = "Update accsingup  SET Balance = ? WHERE AccNum = ? ";
+
+                PreparedStatement ps = conn.prepareStatement(Query);
+                ps.setInt(1, OldBalance - 20000);
+                ps.setInt(2, MyAccNum);
+
+                if (ps.executeUpdate() == 1) {
+
+                    JOptionPane.showMessageDialog(this, "Balance Updated ");
+                    JOptionPane.showMessageDialog(this, "Redirected to Balance for Checking Availavable Balance ");
+
+                    FastCashMoney();
+                    new Balance(MyAccNum).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unsufficient Balance");
                 }
-            }
-            catch(Exception e)
-            {
-                JOptionPane.showMessageDialog(this,e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
 
             }
-    }   
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_a20000MouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         new MainMenu(MyAccNum).setVisible(true);
-          setVisible(false);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-            new login().setVisible(true);
-             setVisible(false);
+        new Login().setVisible(true);
+        setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed
 
